@@ -22,8 +22,27 @@ class ObjectExtractor:
             'Trad': 'organization',
         }
 
+    class ObjectRecord:
+        def __init__(self):
+            self._originals = defaultdict(list)
+            self._total_score = 0.
+            self._normal_form = None
+
+        def add(self, original, normal_form, score, position):
+            self._originals[original].append(position)
+            assert not self._normal_form or self._normal_form == normal_form
+            self._normal_form = normal_form
+            self._total_score += score
+
+        def to_dict(self):
+            return {
+                'name': self._normal_form,
+                'original': self._originals,
+                'score': self._total_score
+            }
+
     def extract(self, text):
-        objects = defaultdict(list)
+        objects = defaultdict(lambda: defaultdict(ObjectExtractor.ObjectRecord))
         for match in self._token_regex.finditer(text):
             word = match.group(0)
             pos = match.span(0)
@@ -38,9 +57,14 @@ class ObjectExtractor:
                 forms = obj.calc_entities()
                 for category, form in forms.items():
                     if form.score() > self._score_threshold:
-                        objects[category].append(self._make_object_record(word, form, pos))
+                        objects[category][form.normal_form()].add(word, form.normal_form(), form.score(), pos)
 
-        return objects
+        r = {}
+
+        for k, v in objects.items():
+            r[k] = list(map(ObjectExtractor.ObjectRecord.to_dict, v.values()))
+
+        return r
 
     @staticmethod
     def _make_object_record(word, form, pos):
