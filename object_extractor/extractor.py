@@ -6,7 +6,8 @@ from .named_object import NamedObject
 
 
 class ObjectExtractor:
-    def __init__(self):
+    def __init__(self, score_threshold=0.6):
+        self._score_threshold = score_threshold
         self._analyzer = pymorphy2.MorphAnalyzer()
         self._token_regex = re.compile(r"(?u)[a-zA-Zа-яА-Я][\w-]{2,}")
 
@@ -36,7 +37,8 @@ class ObjectExtractor:
             if obj:
                 forms = obj.calc_entities()
                 for category, form in forms.items():
-                    objects[category].append(self._make_object_record(word, form, pos))
+                    if form.score() > self._score_threshold:
+                        objects[category].append(self._make_object_record(word, form, pos))
 
         return objects
 
