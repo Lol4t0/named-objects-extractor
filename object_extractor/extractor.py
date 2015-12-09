@@ -22,9 +22,10 @@ class ObjectExtractor:
         }
 
     def extract(self, text):
-        words = self._token_regex.findall(text)
         objects = defaultdict(list)
-        for word in words:
+        for match in self._token_regex.finditer(text):
+            word = match.group(0)
+            pos = match.span(0)
             obj = NamedObject()
             forms = self._analyzer.parse(word)
             for form in forms:
@@ -35,14 +36,15 @@ class ObjectExtractor:
             if obj:
                 forms = obj.calc_entities()
                 for category, form in forms.items():
-                    objects[category].append(self._make_object_record(word, form))
+                    objects[category].append(self._make_object_record(word, form, pos))
 
         return objects
 
     @staticmethod
-    def _make_object_record(word, form):
+    def _make_object_record(word, form, pos):
         return {
             'name': form.normal_form(),
             'original': word,
-            'score': form.score()
+            'score': form.score(),
+            'position': pos
         }
