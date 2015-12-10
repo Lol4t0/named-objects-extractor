@@ -28,11 +28,11 @@ class ObjectExtractor:
             self._total_score = 0.
             self._normal_form = None
 
-        def add(self, original, normal_form, score, position):
+        def add(self, original, normal_form, position):
             self._originals[original].append(position)
             assert not self._normal_form or self._normal_form == normal_form
             self._normal_form = normal_form
-            self._total_score += score
+            self._total_score += 1
 
         def to_dict(self):
             return {
@@ -54,10 +54,8 @@ class ObjectExtractor:
                     if tag_to_check in tags:
                         obj.add(category, form.score, form.normal_form)
             if obj:
-                forms = obj.calc_entities()
-                for category, form in forms.items():
-                    if form.score() > self._score_threshold:
-                        objects[category][form.normal_form()].add(word, form.normal_form(), form.score(), pos)
+                for category, normal_form in obj.identify(self._score_threshold):
+                    objects[category][normal_form].add(word, normal_form, pos)
 
         r = {}
 
