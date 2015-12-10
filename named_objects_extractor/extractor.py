@@ -71,7 +71,7 @@ class ObjectExtractor:
 
     def _join_same_entities(self, entities):
         # Select objects with the most of normal forms first
-        entities.sort(key=lambda x: len(x.normal_form))
+        entities.sort(key=lambda x: len(x.normal_form), reverse=True)
 
         for i, e in enumerate(entities):
             entities[i] = self.ObjectGroupInfo(e.normal_form, [(e.original, e.pos)])
@@ -81,9 +81,7 @@ class ObjectExtractor:
         for src in entities:
             added = False
             for i, dst in enumerate(r):
-                if src.normal_form == dst.normal_form \
-                        or src.normal_form in dst.normal_form \
-                        or dst.normal_form in src.normal_form:
+                if dst.normal_form.issuperset(src.normal_form):
                     originals = src.originals + dst.originals
                     r[i] = self.ObjectGroupInfo(src.normal_form.union(dst.normal_form), originals)
                     added = True
