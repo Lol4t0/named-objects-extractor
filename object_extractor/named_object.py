@@ -8,7 +8,7 @@ class EntityForm:
 
     def add_form(self, score, normal_form):
         self._score += score
-        self.forms[normal_form] += score
+        self.forms[normal_form] = max(score, self.forms[normal_form])
 
     def normal_form(self):
         return max(self.forms.items(), key=lambda x: x[1])[0]
