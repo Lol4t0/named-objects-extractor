@@ -29,17 +29,7 @@ class NamedObject:
 
     def calc_entities(self):
         forms = defaultdict(EntityForm)
-        forms['object'] = self._make_global_entity()
         for object_type, score, normal_form in self._entities:
             forms[object_type].add_form(score, normal_form)
 
         return forms
-
-    def _make_global_entity(self):
-        global_form = EntityForm()
-        for _, score, form in self._entities:
-            global_form.add_form(score, form)
-        return global_form
-
-
-
