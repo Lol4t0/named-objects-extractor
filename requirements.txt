@@ -1,1 +1,1 @@
-pymorphy2
+pymorphy2[fast]
