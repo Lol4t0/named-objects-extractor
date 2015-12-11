@@ -87,7 +87,11 @@ class ObjectExtractor:
 
             if len(merge_candidates) == 1:
                 c_i, c_dst = merge_candidates[0]
-
+                originals = src.originals + c_dst.originals
+                r[c_i] = self.ObjectGroupInfo(src.normal_form.union(c_dst.normal_form), originals)
+            elif merge_candidates and merge_candidates[-1][1].normal_form == src.normal_form:
+                # Name coincides
+                c_i, c_dst = merge_candidates[-1]
                 originals = src.originals + c_dst.originals
                 r[c_i] = self.ObjectGroupInfo(src.normal_form.union(c_dst.normal_form), originals)
             else:
