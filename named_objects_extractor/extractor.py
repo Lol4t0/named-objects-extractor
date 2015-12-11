@@ -14,9 +14,9 @@ class ObjectExtractor:
         self._space_regex = re.compile(r"(?u)^[\s\xa0\t]+$")
 
         self._tags_in_question = {
-            'Name': 'people',
-            'Surn': 'people',
-            'Patr': 'people',
+            'Name': 'person',
+            'Surn': 'person',
+            'Patr': 'person',
 
             'Geox': 'place',
 
