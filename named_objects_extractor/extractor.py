@@ -1,6 +1,7 @@
 from collections import defaultdict, namedtuple
 import re
 import pymorphy2
+import sys
 
 from .named_object import NamedObject
 
@@ -79,15 +80,22 @@ class ObjectExtractor:
         r = []
 
         for src in entities:
-            added = False
+            merge_candidates = []
             for i, dst in enumerate(r):
                 if dst.normal_form.issuperset(src.normal_form):
-                    originals = src.originals + dst.originals
-                    r[i] = self.ObjectGroupInfo(src.normal_form.union(dst.normal_form), originals)
-                    added = True
-                    break
-            if not added:
+                    merge_candidates.append((i, dst))
+
+            if len(merge_candidates) == 1:
+                c_i, c_dst = merge_candidates[0]
+
+                originals = src.originals + c_dst.originals
+                r[c_i] = self.ObjectGroupInfo(src.normal_form.union(c_dst.normal_form), originals)
+            else:
                 r.append(src)
+                if len(merge_candidates) > 1:
+                    print(
+                        "{} may refer to some objects: {}.\n It is not clear what to select, so merging aborted"
+                        .format(src.normal_form, list(map(lambda x: x[1][0], merge_candidates))), file=sys.stderr)
         return r
 
     def _make_dict(self, entities):
