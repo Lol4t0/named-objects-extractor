@@ -111,4 +111,10 @@ class ObjectExtractor:
         d = defaultdict(list)
         for name, pos in originals:
             d[name].append(pos)
-        return d
+        r = []
+        for token, positions in d.items():
+            r.append({
+                'token': token,
+                'positions': positions
+            })
+        return r
